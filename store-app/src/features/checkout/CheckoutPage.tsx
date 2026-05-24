@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { MapPin, CreditCard, Banknote, Building2, CheckCircle, ArrowLeft } from 'lucide-react';
 import { ordersService } from '../../shared/services/orders.service';
+import api from '../../shared/services/api';
 import { useCartStore } from '../../store/cart.store';
 import { useAuthStore } from '../../store/auth.store';
 import { Button } from '../../shared/ui/Button';
@@ -25,6 +26,7 @@ export const CheckoutPage = () => {
   const [address, setAddress] = useState(user?.direccion || '');
   const [payment, setPayment] = useState<PaymentMethod>('EFECTIVO');
   const [success, setSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { mutate: createOrder, isPending } = useMutation({
     mutationFn: ordersService.create,
@@ -32,21 +34,42 @@ export const CheckoutPage = () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       clearCart();
       setSuccess(true);
+      setErrorMsg(null);
       setTimeout(() => navigate('/orders'), 2500);
     },
+    onError: (error: any) => {
+      setErrorMsg(error.response?.data?.detail || 'Error al procesar el pedido. Revisá el stock.');
+    }
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
     if (!address.trim()) return;
-    createOrder({
-      items: items.map((i) => ({ producto_id: i.product.id, cantidad: i.quantity })),
-      direccion_entrega: address,
-      forma_pago: payment,
-    });
+
+    try {
+      // 1. Create or get address
+      const { data: addressData } = await api.post('/direcciones', {
+        calle: address,
+        numero: 'S/N',
+        ciudad: 'Local',
+        alias: 'Entrega'
+      });
+
+      // 2. Map payment method to ID
+      const formaPagoId = payment === 'EFECTIVO' ? 1 : payment === 'TARJETA' ? 2 : 3;
+
+      // 3. Create order
+      createOrder({
+        detalles: items.map((i) => ({ producto_id: i.product.id, cantidad: i.quantity })),
+        direccion_entrega_id: addressData.id,
+        forma_pago_id: formaPagoId,
+      });
+    } catch (error) {
+      console.error('Error al procesar el pedido', error);
+    }
   };
 
   const total = getTotal();
@@ -148,7 +171,7 @@ export const CheckoutPage = () => {
               {items.map((item) => (
                 <div key={item.product.id} className="flex justify-between text-sm text-[#5b4038]">
                   <span className="truncate mr-2">{item.product.nombre} x{item.quantity}</span>
-                  <span className="shrink-0 font-medium">{formatPrice(item.product.precio * item.quantity)}</span>
+                  <span className="shrink-0 font-medium">{formatPrice(item.product.precio_base * item.quantity)}</span>
                 </div>
               ))}
             </div>
@@ -167,6 +190,11 @@ export const CheckoutPage = () => {
             >
               Confirmar pedido
             </Button>
+            {errorMsg && (
+              <div className="mt-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200">
+                {errorMsg}
+              </div>
+            )}
             {!isAuthenticated && (
               <p className="text-xs text-[#5b4038] text-center mt-3">
                 Necesitás <button onClick={() => navigate('/login')} className="text-[#ae3200] font-semibold">iniciar sesión</button> para continuar

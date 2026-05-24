@@ -2,9 +2,13 @@ import api from './api';
 import type { PaginatedResponse, Product, ProductFilters } from '../../types';
 
 export const productsService = {
-  getAll: async (filters?: ProductFilters): Promise<PaginatedResponse<Product>> => {
-    const { data } = await api.get('/productos', { params: filters });
-    return data;
+  getAll: async (filters?: ProductFilters): Promise<Product[]> => {
+    const { data } = await api.get('/productos', { params: { nombre: filters?.search } });
+    let items = Array.isArray(data) ? data : (data.items || []);
+    if (filters?.categoria_id) {
+      items = items.filter(p => p.categorias?.some(c => c.id === filters.categoria_id));
+    }
+    return items;
   },
   getById: async (id: number): Promise<Product> => {
     const { data } = await api.get(`/productos/${id}`);

@@ -3,11 +3,11 @@ export interface Product {
   id: number;
   nombre: string;
   descripcion: string;
-  precio: number;
-  imagen_url: string;
+  precio_base: number;
+  imagenes_url: string[];
   disponible: boolean;
-  stock: number;
-  categoria: Category;
+  stock_cantidad: number;
+  categorias: Category[];
   ingredientes?: string[];
   alergenos?: string[];
   es_destacado?: boolean;
@@ -40,27 +40,28 @@ export type OrderStatus =
 export interface Order {
   id: number;
   usuario_id: number;
-  items: OrderItem[];
   total: number;
-  estado: OrderStatus;
-  direccion_entrega: string;
-  forma_pago: PaymentMethod;
+  estado_actual: { codigo: OrderStatus; nombre: string };
+  direccion_entrega: { calle: string; numero: string; ciudad: string };
+  forma_pago: { codigo: PaymentMethod; nombre: string };
+  detalles?: OrderItem[];
   created_at: string;
   updated_at: string;
 }
 
 export interface OrderItem {
   id: number;
-  producto: Product;
+  producto_id: number;
+  producto_nombre: string;
+  producto_precio: number;
   cantidad: number;
-  precio_unitario: number;
   subtotal: number;
 }
 
 export interface CreateOrderPayload {
-  items: { producto_id: number; cantidad: number }[];
-  direccion_entrega: string;
-  forma_pago: PaymentMethod;
+  detalles: { producto_id: number; cantidad: number }[];
+  direccion_entrega_id: number;
+  forma_pago_id: number;
 }
 
 export type PaymentMethod = 'EFECTIVO' | 'TARJETA' | 'TRANSFERENCIA';
@@ -82,9 +83,9 @@ export interface LoginPayload {
 
 export interface RegisterPayload {
   nombre: string;
+  apellido: string;
   email: string;
   password: string;
-  telefono?: string;
 }
 
 export interface AuthResponse {

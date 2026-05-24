@@ -75,7 +75,7 @@ export const CartDrawer = () => {
                     className="flex gap-4 bg-[#f9f9ff] rounded-xl p-3 border border-[#e4beb3]/20"
                   >
                     <img
-                      src={item.product.imagen_url || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=80&q=70'}
+                      src={item.product.imagenes_url?.[0] || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=80&q=70'}
                       alt={item.product.nombre}
                       className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
                       onError={(e) => {
@@ -87,7 +87,7 @@ export const CartDrawer = () => {
                         {item.product.nombre}
                       </h4>
                       <p className="text-[#ae3200] font-bold text-sm mt-0.5">
-                        {formatPrice(item.product.precio)}
+                        {formatPrice(item.product.precio_base)}
                       </p>
                       <div className="flex items-center justify-between mt-2">
                         <QuantitySelector

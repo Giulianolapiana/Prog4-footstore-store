@@ -46,8 +46,8 @@ export const ProductsPage = () => {
     setPage(1);
   };
 
-  const products = data?.items ?? [];
-  const totalPages = data?.pages ?? 1;
+  const products = Array.isArray(data) ? data : [];
+  const totalPages = 1;
 
   return (
     <div className="max-w-container mx-auto px-4 md:px-10 py-8">
@@ -61,7 +61,7 @@ export const ProductsPage = () => {
           Nuestro Menú
         </motion.h1>
         <p className="text-[#5b4038]">
-          {data?.total !== undefined ? `${data.total} productos disponibles` : 'Explorá todos nuestros platos'}
+          {Array.isArray(data) ? `${data.length} productos disponibles` : 'Explorá todos nuestros platos'}
         </p>
       </div>
 

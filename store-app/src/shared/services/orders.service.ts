@@ -3,7 +3,7 @@ import type { CreateOrderPayload, Order } from '../../types';
 
 export const ordersService = {
   getMyOrders: async (): Promise<Order[]> => {
-    const { data } = await api.get('/pedidos/me');
+    const { data } = await api.get('/pedidos/');
     return data;
   },
   getById: async (id: number): Promise<Order> => {

@@ -55,7 +55,7 @@ export const CartPage = () => {
                 className="flex gap-5 bg-white rounded-2xl p-4 border border-[#e4beb3]/30 shadow-sm"
               >
                 <img
-                  src={item.product.imagen_url || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=120&q=70'}
+                  src={item.product.imagenes_url?.[0] || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=120&q=70'}
                   alt={item.product.nombre}
                   className="w-24 h-24 object-cover rounded-xl shrink-0"
                   onError={(e) => {
@@ -65,7 +65,7 @@ export const CartPage = () => {
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-[#151c27] text-base">{item.product.nombre}</h3>
                   <p className="text-xs text-[#8f7067] mt-0.5">{item.product.categoria?.nombre}</p>
-                  <p className="text-[#ae3200] font-bold mt-1">{formatPrice(item.product.precio)}</p>
+                  <p className="text-[#ae3200] font-bold mt-1">{formatPrice(item.product.precio_base)}</p>
                   <div className="flex items-center justify-between mt-3">
                     <QuantitySelector
                       quantity={item.quantity}
@@ -75,7 +75,7 @@ export const CartPage = () => {
                     />
                     <div className="flex items-center gap-3">
                       <span className="font-bold text-[#151c27]">
-                        {formatPrice(item.product.precio * item.quantity)}
+                        {formatPrice(item.product.precio_base * item.quantity)}
                       </span>
                       <button
                         onClick={() => removeFromCart(item.product.id)}

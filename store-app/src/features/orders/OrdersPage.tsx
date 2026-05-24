@@ -60,8 +60,9 @@ export const OrdersPage = () => {
       ) : (
         <motion.div className="space-y-5">
           {orders.map((order, i) => {
-            const status = statusConfig[order.estado];
-            const canCancel = cancellable.includes(order.estado);
+            const estadoCodigo = order.estado_actual?.codigo || 'PENDIENTE';
+            const status = statusConfig[estadoCodigo];
+            const canCancel = cancellable.includes(estadoCodigo);
 
             return (
               <motion.div
@@ -87,9 +88,9 @@ export const OrdersPage = () => {
 
                 {/* Items */}
                 <div className="space-y-1.5 mb-4">
-                  {order.items?.map((item) => (
+                  {order.detalles?.map((item) => (
                     <div key={item.id} className="flex justify-between text-sm text-[#5b4038]">
-                      <span>{item.producto?.nombre} <span className="text-[#8f7067]">x{item.cantidad}</span></span>
+                      <span>{item.producto_nombre} <span className="text-[#8f7067]">x{item.cantidad}</span></span>
                       <span>{formatPrice(item.subtotal)}</span>
                     </div>
                   ))}

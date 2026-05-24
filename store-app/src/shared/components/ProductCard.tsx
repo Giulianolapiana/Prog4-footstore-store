@@ -23,7 +23,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       <Link to={`/products/${product.id}`} className="block">
         <div className="relative overflow-hidden h-48 bg-[#f0f3ff]">
           <img
-            src={product.imagen_url || fallbackImg}
+            src={product.imagenes_url?.[0] || fallbackImg}
             alt={product.nombre}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             onError={(e) => { (e.target as HTMLImageElement).src = fallbackImg; }}
@@ -41,14 +41,14 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         </div>
         <div className="p-4">
           <div className="mb-1">
-            <span className="text-xs font-mono text-[#8f7067] uppercase tracking-wider">{product.categoria?.nombre}</span>
+            <span className="text-xs font-mono text-[#8f7067] uppercase tracking-wider">{product.categorias?.[0]?.nombre}</span>
           </div>
           <h3 className="font-semibold text-[#151c27] text-base leading-tight mb-1 line-clamp-1">{product.nombre}</h3>
           {product.descripcion && (
             <p className="text-xs text-[#5b4038] line-clamp-2 leading-relaxed mb-3">{product.descripcion}</p>
           )}
           <div className="flex items-center justify-between">
-            <span className="text-lg font-bold text-[#ae3200]">{formatPrice(product.precio)}</span>
+            <span className="text-lg font-bold text-[#ae3200]">{formatPrice(product.precio_base)}</span>
             <motion.button
               whileTap={{ scale: 0.85 }}
               onClick={handleAdd}

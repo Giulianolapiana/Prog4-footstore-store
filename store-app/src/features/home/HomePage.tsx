@@ -28,10 +28,6 @@ export const HomePage = () => {
     queryFn: categoriesService.getAll,
   });
 
-  const { data: masVendidos, isLoading: loadingMasVendidos } = useQuery({
-    queryKey: ['products', 'mas-vendidos'],
-    queryFn: productsService.getMasVendidos,
-  });
 
   const { data: destacados, isLoading: loadingDestacados } = useQuery({
     queryKey: ['products', 'destacados'],
@@ -99,29 +95,7 @@ export const HomePage = () => {
           </motion.div>
         </section>
 
-        {/* Más Vendidos */}
-        <section className="mt-12">
-          <div className="flex items-center justify-between mb-6">
-            <SectionHeader title="Más Vendidos" icon={<Flame className="w-4 h-4 text-[#ae3200]" />} />
-            <Link to="/products" className="text-sm font-semibold text-[#ae3200] hover:text-[#852400] flex items-center gap-1">
-              Ver todo <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-          <motion.div
-            variants={stagger}
-            initial="initial"
-            animate="animate"
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-          >
-            {loadingMasVendidos
-              ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
-              : masVendidos?.slice(0, 8).map((product) => (
-                  <motion.div key={product.id} variants={fadeUp}>
-                    <ProductCard product={product} />
-                  </motion.div>
-                ))}
-          </motion.div>
-        </section>
+
 
         {/* Destacados */}
         {(destacados?.length ?? 0) > 0 && (

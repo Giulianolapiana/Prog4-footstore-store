@@ -42,7 +42,7 @@ export const useCartStore = create<CartStore>()(
       toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
       openCart: () => set({ isOpen: true }),
       closeCart: () => set({ isOpen: false }),
-      getSubtotal: () => get().items.reduce((sum, item) => sum + item.product.precio * item.quantity, 0),
+      getSubtotal: () => get().items.reduce((sum, item) => sum + item.product.precio_base * item.quantity, 0),
       getTotal: () => { const sub = get().getSubtotal(); return sub + (sub > 0 ? 2.5 : 0); },
       getTotalItems: () => get().items.reduce((sum, item) => sum + item.quantity, 0),
     }),

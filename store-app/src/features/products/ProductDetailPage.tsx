@@ -75,9 +75,9 @@ export const ProductDetailPage = () => {
           className="rounded-3xl overflow-hidden bg-[#f0f3ff] aspect-square"
         >
           <img
-            src={product.imagen_url || fallbackImg}
+            src={product.imagenes_url?.[0] || fallbackImg}
             alt={product.nombre}
-            className="w-full h-full object-cover"
+            className="w-full h-[300px] md:h-[500px] object-cover"
             onError={(e) => { (e.target as HTMLImageElement).src = fallbackImg; }}
           />
         </motion.div>
@@ -92,7 +92,7 @@ export const ProductDetailPage = () => {
             <Badge variant="neutral">{product.categoria?.nombre}</Badge>
           </div>
           <h1 className="text-3xl font-bold text-[#151c27] mt-2 mb-3">{product.nombre}</h1>
-          <div className="text-4xl font-bold text-[#ae3200] mb-4">{formatPrice(product.precio)}</div>
+          <span className="text-3xl font-bold text-[#ae3200]">{formatPrice(product.precio_base)}</span>
 
           {/* Availability */}
           <div className="flex items-center gap-2 mb-4">
@@ -105,9 +105,9 @@ export const ProductDetailPage = () => {
                 <AlertCircle className="w-4 h-4" /> No disponible
               </div>
             )}
-            {product.stock !== undefined && (
+            {product.stock_cantidad !== undefined && (
               <span className="text-xs text-[#5b4038] ml-2">
-                Stock: <span className="font-mono-label">{product.stock}</span>
+                Stock: <span className="font-mono-label">{product.stock_cantidad}</span>
               </span>
             )}
           </div>
@@ -124,9 +124,9 @@ export const ProductDetailPage = () => {
                 <Leaf className="w-4 h-4 text-green-600" /> Ingredientes
               </div>
               <div className="flex flex-wrap gap-2">
-                {product.ingredientes.map((ing) => (
-                  <span key={ing} className="bg-[#f0f3ff] text-[#5b4038] text-xs px-3 py-1 rounded-full">
-                    {ing}
+                {product.ingredientes.map((ing: any) => (
+                  <span key={ing.id || ing.nombre} className="bg-[#f0f3ff] text-[#5b4038] text-xs px-3 py-1 rounded-full">
+                    {ing.nombre}
                   </span>
                 ))}
               </div>
@@ -140,8 +140,8 @@ export const ProductDetailPage = () => {
                 <Info className="w-4 h-4" /> Alérgenos
               </div>
               <div className="flex flex-wrap gap-1.5">
-                {product.alergenos.map((al) => (
-                  <Badge key={al} variant="warning">{al}</Badge>
+                {product.alergenos.map((al: any) => (
+                  <Badge key={al.id || al.nombre || al} variant="warning">{al.nombre || al}</Badge>
                 ))}
               </div>
             </div>
@@ -152,9 +152,9 @@ export const ProductDetailPage = () => {
             <div className="flex gap-3 items-center flex-wrap">
               <QuantitySelector
                 quantity={quantity}
-                onIncrease={() => setQuantity((q) => q + 1)}
+                onIncrease={() => setQuantity((q) => Math.min(product.stock_cantidad ?? 99, q + 1))}
                 onDecrease={() => setQuantity((q) => Math.max(1, q - 1))}
-                max={product.stock}
+                max={product.stock_cantidad}
               />
               <Button
                 size="lg"

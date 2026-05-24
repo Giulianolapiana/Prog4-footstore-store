@@ -11,7 +11,7 @@ import { Button } from '../../shared/ui/Button';
 export const RegisterPage = () => {
   const navigate = useNavigate();
   const { setUser } = useAuthStore();
-  const [form, setForm] = useState({ nombre: '', email: '', password: '', telefono: '' });
+  const [form, setForm] = useState({ nombre: '', apellido: '', email: '', password: '' });
   const [error, setError] = useState('');
 
   const { mutate: register, isPending } = useMutation({
@@ -26,7 +26,7 @@ export const RegisterPage = () => {
   });
 
   const handleSubmit = () => {
-    if (!form.nombre || !form.email || !form.password) return;
+    if (!form.nombre || !form.apellido || !form.email || !form.password) return;
     setError('');
     register(form);
   };
@@ -49,8 +49,8 @@ export const RegisterPage = () => {
             onChange={set('nombre')} leftIcon={<User className="w-4 h-4" />} />
           <Input label="Email" type="email" placeholder="tu@email.com" value={form.email}
             onChange={set('email')} leftIcon={<Mail className="w-4 h-4" />} />
-          <Input label="Teléfono" type="tel" placeholder="+54 261 555-1234" value={form.telefono}
-            onChange={set('telefono')} leftIcon={<Phone className="w-4 h-4" />} />
+          <Input label="Apellido" placeholder="Pérez" value={form.apellido}
+            onChange={set('apellido')} leftIcon={<User className="w-4 h-4" />} />
           <Input label="Contraseña" type="password" placeholder="Mínimo 8 caracteres" value={form.password}
             onChange={set('password')} leftIcon={<Lock className="w-4 h-4" />} />
 
