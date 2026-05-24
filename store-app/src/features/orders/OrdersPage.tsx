@@ -1,0 +1,121 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import { ClipboardList, Clock, Package, Truck, CheckCircle, XCircle, ChefHat } from 'lucide-react';
+import { ordersService } from '../../shared/services/orders.service';
+import { Badge } from '../../shared/ui/Badge';
+import { Button } from '../../shared/ui/Button';
+import { EmptyState } from '../../shared/ui/EmptyState';
+import { Skeleton } from '../../shared/ui/Skeleton';
+import type { OrderStatus } from '../../types';
+import { formatDate, formatPrice } from '../../shared/lib/utils';
+
+const statusConfig: Record<OrderStatus, { label: string; variant: 'neutral' | 'warning' | 'info' | 'success' | 'error' | 'primary'; icon: React.ReactNode }> = {
+  PENDIENTE: { label: 'Pendiente', variant: 'warning', icon: <Clock className="w-3.5 h-3.5" /> },
+  CONFIRMADO: { label: 'Confirmado', variant: 'info', icon: <CheckCircle className="w-3.5 h-3.5" /> },
+  EN_PREP: { label: 'En preparación', variant: 'primary', icon: <ChefHat className="w-3.5 h-3.5" /> },
+  EN_CAMINO: { label: 'En camino', variant: 'info', icon: <Truck className="w-3.5 h-3.5" /> },
+  ENTREGADO: { label: 'Entregado', variant: 'success', icon: <Package className="w-3.5 h-3.5" /> },
+  CANCELADO: { label: 'Cancelado', variant: 'error', icon: <XCircle className="w-3.5 h-3.5" /> },
+};
+
+const cancellable: OrderStatus[] = ['PENDIENTE', 'CONFIRMADO'];
+
+export const OrdersPage = () => {
+  const queryClient = useQueryClient();
+
+  const { data: orders, isLoading, isError } = useQuery({
+    queryKey: ['orders'],
+    queryFn: ordersService.getMyOrders,
+  });
+
+  const { mutate: cancelOrder, isPending: cancelling } = useMutation({
+    mutationFn: ordersService.cancel,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['orders'] }),
+  });
+
+  if (isLoading) return (
+    <div className="max-w-3xl mx-auto px-4 py-8 space-y-4">
+      <Skeleton className="h-10 w-48 mb-8" />
+      {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-40 w-full rounded-2xl" />)}
+    </div>
+  );
+
+  if (isError) return (
+    <div className="text-center py-16 text-[#ba1a1a]">
+      Error al cargar pedidos. Intentá de nuevo.
+    </div>
+  );
+
+  return (
+    <div className="max-w-3xl mx-auto px-4 md:px-10 py-8">
+      <h1 className="text-3xl font-bold text-[#151c27] mb-8">Mis Pedidos</h1>
+
+      {!orders || orders.length === 0 ? (
+        <EmptyState
+          icon={ClipboardList}
+          title="No tenés pedidos aún"
+          description="Hacé tu primer pedido y aparecerá aquí"
+          action={{ label: 'Ver menú', onClick: () => window.location.href = '/products' }}
+        />
+      ) : (
+        <motion.div className="space-y-5">
+          {orders.map((order, i) => {
+            const status = statusConfig[order.estado];
+            const canCancel = cancellable.includes(order.estado);
+
+            return (
+              <motion.div
+                key={order.id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.06 }}
+                className="bg-white rounded-2xl border border-[#e4beb3]/30 p-5 shadow-sm"
+              >
+                <div className="flex items-start justify-between flex-wrap gap-3 mb-4">
+                  <div>
+                    <span className="font-mono-label text-xs text-[#8f7067]">Pedido #</span>
+                    <span className="font-mono text-sm font-bold text-[#151c27]">{order.id}</span>
+                    <p className="text-xs text-[#8f7067] mt-0.5">{formatDate(order.created_at)}</p>
+                  </div>
+                  <Badge variant={status.variant}>
+                    <span className="flex items-center gap-1">
+                      {status.icon}
+                      {status.label}
+                    </span>
+                  </Badge>
+                </div>
+
+                {/* Items */}
+                <div className="space-y-1.5 mb-4">
+                  {order.items?.map((item) => (
+                    <div key={item.id} className="flex justify-between text-sm text-[#5b4038]">
+                      <span>{item.producto?.nombre} <span className="text-[#8f7067]">x{item.cantidad}</span></span>
+                      <span>{formatPrice(item.subtotal)}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between border-t border-[#e4beb3]/30 pt-3">
+                  <div className="text-sm text-[#5b4038]">
+                    <span className="font-medium">Total: </span>
+                    <span className="text-[#ae3200] font-bold text-base">{formatPrice(order.total)}</span>
+                  </div>
+                  {canCancel && (
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      loading={cancelling}
+                      onClick={() => cancelOrder(order.id)}
+                    >
+                      Cancelar
+                    </Button>
+                  )}
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      )}
+    </div>
+  );
+};
