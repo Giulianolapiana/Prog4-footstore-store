@@ -10,7 +10,7 @@ import { useAuthStore } from '../../store/auth.store';
 import { Button } from '../../shared/ui/Button';
 import { Input } from '../../shared/ui/Input';
 import { formatPrice } from '../../shared/lib/utils';
-import type { PaymentMethod } from '../../types';
+import type { PaymentMethod } from './types';
 
 const paymentOptions: { value: PaymentMethod; label: string; icon: React.ReactNode }[] = [
   { value: 'EFECTIVO', label: 'Efectivo', icon: <Banknote className="w-5 h-5" /> },
