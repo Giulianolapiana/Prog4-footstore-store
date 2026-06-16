@@ -1,5 +1,5 @@
 import api from './api';
-import type { CreateOrderPayload, Order } from '../../types';
+import type { CreateOrderPayload, Order } from '../../features/orders/types';
 
 export const ordersService = {
   getMyOrders: async (): Promise<Order[]> => {

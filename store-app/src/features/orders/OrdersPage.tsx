@@ -6,7 +6,7 @@ import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { EmptyState } from '../../shared/ui/EmptyState';
 import { Skeleton } from '../../shared/ui/Skeleton';
-import type { OrderStatus } from '../../types';
+import type { OrderStatus } from './types';
 import { formatDate, formatPrice } from '../../shared/lib/utils';
 
 const statusConfig: Record<OrderStatus, { label: string; variant: 'neutral' | 'warning' | 'info' | 'success' | 'error' | 'primary'; icon: React.ReactNode }> = {

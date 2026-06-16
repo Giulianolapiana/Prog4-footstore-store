@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Plus, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import type { Product } from '../../types';
+import type { Product } from '../../features/products/types';
 import { useCartStore } from '../../store/cart.store';
 import { formatPrice } from '../lib/utils';
 

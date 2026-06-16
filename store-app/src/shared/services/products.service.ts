@@ -1,5 +1,5 @@
 import api from './api';
-import type { Product, ProductFilters } from '../../types';
+import type { PaginatedResponse, Product, ProductFilters } from '../../types';
 
 export const productsService = {
   getAll: async (filters?: ProductFilters): Promise<Product[]> => {
