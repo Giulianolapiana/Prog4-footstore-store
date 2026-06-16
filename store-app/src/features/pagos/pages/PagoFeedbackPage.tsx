@@ -4,7 +4,7 @@ import { CheckCircle, XCircle, Clock, ArrowRight } from 'lucide-react';
 import { useCartStore } from '../../../store/cart.store';
 
 export const PagoFeedbackPage = () => {
-  const { status } = useParams<{ status: string }>(); // 'exito', 'pendiente', 'error'
+  const { status } = useParams<{ status: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const clearCart = useCartStore((state) => state.clearCart);

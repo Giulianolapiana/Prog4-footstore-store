@@ -6,7 +6,7 @@ export const pagosService = {
    * Crea un pago/preferencia en Mercado Pago a través del backend
    */
   crearPago: async (payload: PagoRequest): Promise<PreferenciaResponse> => {
-    const { data } = await api.post('/pagos/crear', payload);
+    const { data } = await api.post('/pagos/create-preference', payload);
     return data;
   },
 

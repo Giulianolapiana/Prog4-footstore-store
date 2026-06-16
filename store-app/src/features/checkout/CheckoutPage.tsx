@@ -35,10 +35,10 @@ export const CheckoutPage = () => {
     mutationFn: ordersService.create,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      clearCart();
       if (payment === 'MERCADOPAGO') {
         setCreatedOrderId(data.id);
       } else {
+        clearCart();
         setSuccess(true);
         setErrorMsg(null);
         setTimeout(() => navigate('/orders'), 2500);
