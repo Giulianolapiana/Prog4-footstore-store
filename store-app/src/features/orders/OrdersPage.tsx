@@ -20,8 +20,11 @@ const statusConfig: Record<OrderStatus, { label: string; variant: 'neutral' | 'w
 
 const cancellable: OrderStatus[] = ['PENDIENTE', 'CONFIRMADO'];
 
+import { useOrderStatusWS } from './hooks/useOrderStatusWS';
+
 export const OrdersPage = () => {
   const queryClient = useQueryClient();
+  useOrderStatusWS();
 
   const { data: orders, isLoading, isError } = useQuery({
     queryKey: ['orders'],
