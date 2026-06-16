@@ -10,12 +10,14 @@ import { useAuthStore } from '../../store/auth.store';
 import { Button } from '../../shared/ui/Button';
 import { Input } from '../../shared/ui/Input';
 import { formatPrice } from '../../shared/lib/utils';
-import type { PaymentMethod } from '../../types';
+import { MercadoPagoButton } from '../pagos';
+import type { PaymentMethod } from './types';
 
-const paymentOptions: { value: PaymentMethod; label: string; icon: React.ReactNode }[] = [
+const paymentOptions: { value: string; label: string; icon: React.ReactNode }[] = [
   { value: 'EFECTIVO', label: 'Efectivo', icon: <Banknote className="w-5 h-5" /> },
   { value: 'TARJETA', label: 'Tarjeta', icon: <CreditCard className="w-5 h-5" /> },
   { value: 'TRANSFERENCIA', label: 'Transferencia', icon: <Building2 className="w-5 h-5" /> },
+  { value: 'MERCADOPAGO', label: 'Mercado Pago', icon: <CreditCard className="w-5 h-5 text-blue-500" /> },
 ];
 
 export const CheckoutPage = () => {
@@ -24,18 +26,23 @@ export const CheckoutPage = () => {
   const { items, getTotal, clearCart } = useCartStore();
   const { isAuthenticated, user } = useAuthStore();
   const [address, setAddress] = useState(user?.direccion || '');
-  const [payment, setPayment] = useState<PaymentMethod>('EFECTIVO');
+  const [payment, setPayment] = useState<string>('MERCADOPAGO');
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [createdOrderId, setCreatedOrderId] = useState<number | null>(null);
 
   const { mutate: createOrder, isPending } = useMutation({
     mutationFn: ordersService.create,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      clearCart();
-      setSuccess(true);
-      setErrorMsg(null);
-      setTimeout(() => navigate('/orders'), 2500);
+      if (payment === 'MERCADOPAGO') {
+        setCreatedOrderId(data.id);
+      } else {
+        clearCart();
+        setSuccess(true);
+        setErrorMsg(null);
+        setTimeout(() => navigate('/orders'), 2500);
+      }
     },
     onError: (error: any) => {
       setErrorMsg(error.response?.data?.detail || 'Error al procesar el pedido. Revisá el stock.');
@@ -59,7 +66,7 @@ export const CheckoutPage = () => {
       });
 
       // 2. Map payment method to ID
-      const formaPagoId = payment === 'EFECTIVO' ? 1 : payment === 'TARJETA' ? 2 : 3;
+      const formaPagoId = payment === 'EFECTIVO' ? 1 : payment === 'TARJETA' ? 2 : payment === 'MERCADOPAGO' ? 4 : 3;
 
       // 3. Create order
       createOrder({
@@ -92,7 +99,7 @@ export const CheckoutPage = () => {
     );
   }
 
-  if (items.length === 0) {
+  if (items.length === 0 && !createdOrderId) {
     navigate('/cart');
     return null;
   }
@@ -181,15 +188,27 @@ export const CheckoutPage = () => {
                 <span className="text-[#ae3200] text-xl">{formatPrice(total)}</span>
               </div>
             </div>
-            <Button
-              fullWidth
-              size="lg"
-              loading={isPending}
-              disabled={!address.trim()}
-              onClick={handleSubmit}
-            >
-              Confirmar pedido
-            </Button>
+
+            {createdOrderId ? (
+              <div className="mt-4 border-t border-[#e4beb3]/40 pt-4">
+                <h3 className="text-center font-semibold text-[#151c27] mb-3">Completá tu pago</h3>
+                <MercadoPagoButton 
+                  pedidoId={createdOrderId} 
+                  montoTotal={total}
+                />
+              </div>
+            ) : (
+              <Button
+                fullWidth
+                size="lg"
+                loading={isPending}
+                disabled={!address.trim()}
+                onClick={handleSubmit}
+              >
+                Confirmar pedido
+              </Button>
+            )}
+
             {errorMsg && (
               <div className="mt-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200">
                 {errorMsg}

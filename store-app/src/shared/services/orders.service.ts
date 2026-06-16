@@ -1,5 +1,5 @@
 import api from './api';
-import type { CreateOrderPayload, Order } from '../../types';
+import type { CreateOrderPayload, Order } from '../../features/orders/types';
 
 export const ordersService = {
   getMyOrders: async (): Promise<Order[]> => {
@@ -11,7 +11,7 @@ export const ordersService = {
     return data;
   },
   create: async (payload: CreateOrderPayload): Promise<Order> => {
-    const { data } = await api.post('/pedidos', payload);
+    const { data } = await api.post('/pedidos/', payload);
     return data;
   },
   cancel: async (id: number): Promise<Order> => {

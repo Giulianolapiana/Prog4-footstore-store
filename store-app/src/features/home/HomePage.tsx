@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Flame, Sparkles, Tag } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight, Sparkles, Tag } from 'lucide-react';
 import { productsService } from '../../shared/services/products.service';
 import { categoriesService } from '../../shared/services/categories.service';
 import { ProductCard } from '../../shared/components/ProductCard';

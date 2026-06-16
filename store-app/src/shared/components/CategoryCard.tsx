@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import type { Category } from '../../types';
+import type { Category } from '../../features/products/types';
 import { Beef, Pizza, Sandwich, Star, Coffee, IceCream, UtensilsCrossed } from 'lucide-react';
 
 const iconMap: Record<string, React.ReactNode> = {
