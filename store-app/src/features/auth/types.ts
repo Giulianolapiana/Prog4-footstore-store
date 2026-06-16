@@ -1,11 +1,10 @@
-// Tipos propios de la feature de Autenticación
-
 export interface User {
   id: number;
   nombre: string;
   apellido: string;
   email: string;
   is_active: boolean;
+  direccion?: string;
   roles: UserRole[];
 }
 

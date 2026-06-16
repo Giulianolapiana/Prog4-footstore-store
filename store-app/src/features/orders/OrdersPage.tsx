@@ -1,7 +1,9 @@
+import React from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ClipboardList, Clock, Package, Truck, CheckCircle, XCircle, ChefHat } from 'lucide-react';
+import { ClipboardList, Clock, CheckCircle2, ChefHat, Truck, Package, XCircle, CreditCard } from 'lucide-react';
 import { ordersService } from '../../shared/services/orders.service';
+import { useCrearPago } from '../pagos/hooks';
 import { Badge } from '../../shared/ui/Badge';
 import { Button } from '../../shared/ui/Button';
 import { EmptyState } from '../../shared/ui/EmptyState';
@@ -11,7 +13,7 @@ import { formatDate, formatPrice } from '../../shared/lib/utils';
 
 const statusConfig: Record<OrderStatus, { label: string; variant: 'neutral' | 'warning' | 'info' | 'success' | 'error' | 'primary'; icon: React.ReactNode }> = {
   PENDIENTE: { label: 'Pendiente', variant: 'warning', icon: <Clock className="w-3.5 h-3.5" /> },
-  CONFIRMADO: { label: 'Confirmado', variant: 'info', icon: <CheckCircle className="w-3.5 h-3.5" /> },
+  CONFIRMADO: { label: 'Confirmado', variant: 'info', icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
   EN_PREP: { label: 'En preparación', variant: 'primary', icon: <ChefHat className="w-3.5 h-3.5" /> },
   EN_CAMINO: { label: 'En camino', variant: 'info', icon: <Truck className="w-3.5 h-3.5" /> },
   ENTREGADO: { label: 'Entregado', variant: 'success', icon: <Package className="w-3.5 h-3.5" /> },
@@ -19,6 +21,33 @@ const statusConfig: Record<OrderStatus, { label: string; variant: 'neutral' | 'w
 };
 
 const cancellable: OrderStatus[] = ['PENDIENTE', 'CONFIRMADO'];
+
+const RetryPaymentButton = ({ order }: { order: import('./types').Order }) => {
+  const { mutate, data: preferencia, isPending } = useCrearPago();
+
+  React.useEffect(() => {
+    if (preferencia?.init_point) {
+      window.location.href = preferencia.init_point;
+    }
+  }, [preferencia]);
+
+  const handleRetry = () => {
+    mutate({ pedido_id: order.id });
+  };
+
+  return (
+    <Button
+      variant="primary"
+      size="sm"
+      loading={isPending}
+      onClick={handleRetry}
+      className="ml-2 bg-blue-500 hover:bg-blue-600 border-none text-white font-medium shadow-sm transition-all flex items-center gap-1.5"
+    >
+      <CreditCard className="w-3.5 h-3.5" />
+      Reintentar Pago
+    </Button>
+  );
+};
 
 export const OrdersPage = () => {
   const queryClient = useQueryClient();
@@ -101,16 +130,22 @@ export const OrdersPage = () => {
                     <span className="font-medium">Total: </span>
                     <span className="text-[#ae3200] font-bold text-base">{formatPrice(order.total)}</span>
                   </div>
-                  {canCancel && (
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      loading={cancelling}
-                      onClick={() => cancelOrder(order.id)}
-                    >
-                      Cancelar
-                    </Button>
-                  )}
+                  <div className="flex gap-2">
+                    {canCancel && (
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        loading={cancelling}
+                        onClick={() => cancelOrder(order.id)}
+                      >
+                        Cancelar
+                      </Button>
+                    )}
+                    {order.estado_actual?.codigo === 'PENDIENTE' && 
+                     order.forma_pago?.codigo === 'MP' && (
+                      <RetryPaymentButton order={order} />
+                    )}
+                  </div>
                 </div>
               </motion.div>
             );
