@@ -8,11 +8,17 @@ import { ProductDetailPage } from '../../features/products/ProductDetailPage';
 import { CartPage } from '../../features/cart/CartPage';
 import { CheckoutPage } from '../../features/checkout/CheckoutPage';
 import { OrdersPage } from '../../features/orders/OrdersPage';
+import { PagoFeedbackPage } from '../../features/pagos';
 import { LoginPage } from '../../features/auth/LoginPage';
 import { RegisterPage } from '../../features/auth/RegisterPage';
+import { useOrderStatusWS } from '../../features/orders/hooks/useOrderStatusWS';
 
-export const AppRouter = () => (
-  <BrowserRouter>
+export const AppRouter = () => {
+  // Initialize WebSocket connection globally if user is logged in
+  useOrderStatusWS();
+
+  return (
+    <BrowserRouter>
     <Routes>
       {/* Public routes with main layout */}
       <Route element={<MainLayout />}>
@@ -25,6 +31,7 @@ export const AppRouter = () => (
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/pago/:status" element={<PagoFeedbackPage />} />
         </Route>
       </Route>
 
@@ -38,4 +45,5 @@ export const AppRouter = () => (
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </BrowserRouter>
-);
+  );
+};
