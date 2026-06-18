@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export interface WsMessage {
   event: 'estado_cambiado' | 'pedido_cancelado' | 'pago_confirmado' | 'WS_CONNECTED';
@@ -20,7 +21,9 @@ interface WsState {
   clearLastMessage: () => void;
 }
 
-export const useWsStore = create<WsState>((set, get) => {
+export const useWsStore = create<WsState>()(
+  persist(
+    (set, get) => {
   let retryTimer: ReturnType<typeof setTimeout> | null = null;
   let retryCount = 0;
   let isIntentionallyClosed = false;
@@ -112,4 +115,10 @@ export const useWsStore = create<WsState>((set, get) => {
 
     clearLastMessage: () => set({ lastMessage: null })
   };
-});
+    },
+    {
+      name: 'ws-store',
+      partialize: (state) => ({ lastMessage: state.lastMessage }), // Solo persistimos el último mensaje
+    }
+  )
+);
