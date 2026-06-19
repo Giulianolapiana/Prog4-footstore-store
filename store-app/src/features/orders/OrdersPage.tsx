@@ -142,7 +142,7 @@ export const OrdersPage = () => {
                       </Button>
                     )}
                     {order.estado_actual?.codigo === 'PENDIENTE' && 
-                     order.forma_pago?.codigo === 'MP' && (
+                     order.forma_pago?.codigo === 'MERCADOPAGO' && (
                       <RetryPaymentButton order={order} />
                     )}
                   </div>
