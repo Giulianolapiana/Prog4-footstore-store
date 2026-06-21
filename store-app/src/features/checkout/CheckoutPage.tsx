@@ -11,7 +11,7 @@ import { Button } from '../../shared/ui/Button';
 import { Input } from '../../shared/ui/Input';
 import { formatPrice } from '../../shared/lib/utils';
 import { MercadoPagoButton } from '../pagos';
-import type { PaymentMethod } from './types';
+
 
 const paymentOptions: { value: string; label: string; icon: React.ReactNode }[] = [
   { value: 'EFECTIVO', label: 'Efectivo', icon: <Banknote className="w-5 h-5" /> },
@@ -57,7 +57,6 @@ export const CheckoutPage = () => {
     if (!address.trim()) return;
 
     try {
-      // 1. Create or get address
       const { data: addressData } = await api.post('/direcciones', {
         calle: address,
         numero: 'S/N',
@@ -65,10 +64,8 @@ export const CheckoutPage = () => {
         alias: 'Entrega'
       });
 
-      // 2. Map payment method to ID
       const formaPagoId = payment === 'EFECTIVO' ? 1 : payment === 'TARJETA' ? 2 : payment === 'MERCADOPAGO' ? 4 : 3;
 
-      // 3. Create order
       createOrder({
         detalles: items.map((i) => ({ producto_id: i.product.id, cantidad: i.quantity })),
         direccion_entrega_id: addressData.id,

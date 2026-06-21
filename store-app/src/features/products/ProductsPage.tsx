@@ -10,10 +10,12 @@ import { CategoryCard } from '../../shared/components/CategoryCard';
 import { ProductCardSkeleton } from '../../shared/ui/Skeleton';
 import { EmptyState } from '../../shared/ui/EmptyState';
 import { Input } from '../../shared/ui/Input';
+import { useDebounce } from '../../shared/hooks/useDebounce';
 
 export const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 500); // 500ms delay
   const [page, setPage] = useState(1);
 
   const categoriaId = searchParams.get('categoria')
@@ -26,10 +28,10 @@ export const ProductsPage = () => {
   });
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['products', { search, categoriaId, page }],
+    queryKey: ['products', { search: debouncedSearch, categoriaId, page }],
     queryFn: () =>
       productsService.getAll({
-        search: search || undefined,
+        search: debouncedSearch || undefined,
         categoria_id: categoriaId,
         page,
         size: 12,

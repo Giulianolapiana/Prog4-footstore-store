@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingCart, Trash2, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCartStore } from '../../store/cart.store';
 import { QuantitySelector } from '../ui/QuantitySelector';
 import { Button } from '../ui/Button';
@@ -8,6 +8,7 @@ import { formatPrice } from '../lib/utils';
 import { EmptyState } from '../ui/EmptyState';
 
 export const CartDrawer = () => {
+  const navigate = useNavigate();
   const { items, isOpen, closeCart, removeFromCart, updateQuantity, getSubtotal, getTotal } =
     useCartStore();
 
@@ -62,7 +63,7 @@ export const CartDrawer = () => {
                   icon={ShoppingCart}
                   title="Tu carrito está vacío"
                   description="Agregá productos del menú para comenzar tu pedido"
-                  action={{ label: 'Ver menú', onClick: closeCart }}
+                  action={{ label: 'Ver menú', onClick: () => { closeCart(); navigate('/products'); } }}
                 />
               ) : (
                 items.map((item) => (
