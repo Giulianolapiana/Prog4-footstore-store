@@ -17,6 +17,7 @@ export const ProductDetailPage = () => {
   const { addToCart, openCart } = useCartStore();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [removedIngs, setRemovedIngs] = useState<number[]>([]);
 
   const { data: product, isLoading, isError } = useQuery({
     queryKey: ['product', id],
@@ -118,17 +119,47 @@ export const ProductDetailPage = () => {
           )}
 
           {/* Ingredients */}
-          {product.ingredientes && product.ingredientes.length > 0 && (
+          {product.producto_ingredientes && product.producto_ingredientes.length > 0 && (
             <div className="mb-4">
               <div className="flex items-center gap-2 text-sm font-semibold text-[#151c27] mb-2">
                 <Leaf className="w-4 h-4 text-green-600" /> Ingredientes
               </div>
-              <div className="flex flex-wrap gap-2">
-                {product.ingredientes.map((ing: any) => (
-                  <span key={ing.id || ing.nombre} className="bg-[#f0f3ff] text-[#5b4038] text-xs px-3 py-1 rounded-full">
-                    {ing.nombre}
-                  </span>
-                ))}
+              <div className="flex flex-col gap-2">
+                {product.producto_ingredientes.map((pi: any) => {
+                  const isRemoved = removedIngs.includes(pi.ingrediente.id);
+                  return (
+                    <div 
+                      key={pi.ingrediente.id || pi.ingrediente.nombre} 
+                      className={`flex items-center justify-between p-2 rounded-xl border ${isRemoved ? 'bg-gray-50 border-gray-100 opacity-60' : 'bg-[#f0f3ff] border-blue-100'}`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm font-medium text-[#5b4038] ${isRemoved ? 'line-through text-gray-400' : ''}`}>
+                          {pi.ingrediente.nombre}
+                        </span>
+                        <span className="opacity-70 font-mono-label text-xs">({Number(pi.cantidad)} {pi.unidad_medida?.simbolo})</span>
+                      </div>
+                      
+                      {pi.es_removible && (
+                        <button
+                          onClick={() => {
+                            if (isRemoved) {
+                              setRemovedIngs(prev => prev.filter(id => id !== pi.ingrediente.id));
+                            } else {
+                              setRemovedIngs(prev => [...prev, pi.ingrediente.id]);
+                            }
+                          }}
+                          className={`text-xs px-3 py-1 rounded-full font-medium transition-colors ${
+                            isRemoved 
+                              ? 'bg-gray-200 text-gray-600 hover:bg-gray-300' 
+                              : 'bg-white text-red-600 border border-red-200 hover:bg-red-50 shadow-sm'
+                          }`}
+                        >
+                          {isRemoved ? 'Agregar' : 'Quitar'}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
