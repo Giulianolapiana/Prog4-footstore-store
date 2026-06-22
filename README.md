@@ -1,7 +1,7 @@
 # Store
 
-https://www.youtube.com/watch?v=T5U75H9Gki0
-https://youtu.be/sqpembLRGBA
+1: https://www.youtube.com/watch?v=T5U75H9Gki0
+2: https://youtu.be/sqpembLRGBA
 
 `store-app` es la aplicación cliente del módulo Store del Parcial (Vite + React + TypeScript). Está diseñada para consumir la API backend y cubrir el flujo de compra: catálogo, carrito persistente y gestión de pedidos.
 
